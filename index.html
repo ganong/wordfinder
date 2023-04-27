@@ -1,0 +1,116 @@
+<html>
+  <body>
+    <div id="root"></div>
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./wordlist.js"></script>
+    <script type="text/babel">
+      // wordlist comes from wordlist.js
+
+      function* chunks(arr, n) {
+        for (let i = 0; i < arr.length; i += n) {
+          yield arr.slice(i, i + n);
+        }
+      }
+
+      function App() {
+        const [words, setWords] = React.useState();
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          setWords(undefined);
+          const letters = e.target.letters.value.toLowerCase();
+          const mustHave = e.target.mustHave.value.toLowerCase();
+          const regex = new RegExp(`^[${letters}]+$`);
+          const newWordsObj = wordlist.reduce((agg, word) => {
+            if (mustHave && !word.includes(mustHave)) return agg;
+            if (!regex.test(word)) return agg;
+
+            const len = word.length;
+            if (!agg[len]) {
+              agg[len] = [];
+              if (!agg.maxLen || len > agg.maxLen) {
+                agg.maxLen = len;
+              }
+            }
+            agg[len].push(word);
+            return agg;
+          }, {});
+
+          const newWords = [];
+          for (let i = newWordsObj.maxLen; i > 0; i--) {
+            if (!newWordsObj[i]) {
+              continue;
+            }
+            newWords.push(newWordsObj[i]);
+          }
+
+          setWords(newWords);
+        };
+
+        return (
+          <div style={{ fontSize: 20 }}>
+            <form
+              onSubmit={handleSubmit}
+              style={{ padding: 0, margin: 0, paddingBottom: 10 }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{ fontSize: 25, paddingRight: 30, fontWeight: "bold" }}
+                >
+                  Interspeller
+                </div>
+                <div style={{ padding: "0 10px" }}>
+                  <span style={{ paddingRight: 10 }}>Letters:</span>
+                  <input type="text" name="letters" />
+                </div>
+                <div style={{ padding: "0 10px" }}>
+                  <span style={{ paddingRight: 10 }}>Must have:</span>
+                  <input type="text" name="mustHave" />
+                </div>
+                <div style={{ padding: "0 10px" }}>
+                  <input type="submit" value="Go" />
+                </div>
+              </div>
+            </form>
+            {words && (
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {words.map((chunk, i) => (
+                  <div
+                    style={{
+                      padding: "0 10px",
+                      backgroundColor: i % 2 === 0 ? "#fff" : "#e6e6ff",
+                    }}
+                  >
+                    <p>
+                      <strong>
+                        {chunk[0].length}&nbsp;Letter
+                        {chunk[0].length > 1 ? "s" : ""}
+                      </strong>
+                    </p>
+                    <ul
+                      style={{ listStyleType: "none", margin: 0, padding: 0 }}
+                    >
+                      {chunk.map((word) => (
+                        <li style={{ paddingBottom: 5 }}>{word}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
