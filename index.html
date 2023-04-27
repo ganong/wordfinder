@@ -33,8 +33,17 @@
           const letters = e.target.letters.value.toLowerCase();
           const mustHave = e.target.mustHave.value.toLowerCase();
           const regex = new RegExp(`^[${letters}]+$`);
+          let mustHaveRegex = null;
+          if (mustHave) {
+            const chars = mustHave.split("");
+            mustHaveRegex = new RegExp(
+              chars.reduce((agg, char) => {
+                return agg + `(?=.*${char})`;
+              }, "")
+            );
+          }
           const newWordsObj = wordlist.reduce((agg, word) => {
-            if (mustHave && !word.includes(mustHave)) return agg;
+            if (mustHaveRegex && !mustHaveRegex.test(word)) return agg;
             if (!regex.test(word)) return agg;
 
             const len = word.length;
