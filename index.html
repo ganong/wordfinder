@@ -95,28 +95,31 @@
             </form>
             {words && (
               <div style={{ display: "flex", flexDirection: "row" }}>
-                {words.map((chunk, i) => (
-                  <div
-                    style={{
-                      padding: "0 10px",
-                      backgroundColor: i % 2 === 0 ? "#fff" : "#e6e6ff",
-                    }}
-                  >
-                    <p>
-                      <strong>
-                        {chunk[0].length}&nbsp;Letter
-                        {chunk[0].length > 1 ? "s" : ""}
-                      </strong>
-                    </p>
-                    <ul
-                      style={{ listStyleType: "none", margin: 0, padding: 0 }}
+                {words.map((chunk, i) => {
+                  const wordLen = chunk[0].length;
+                  return (
+                    <div
+                      style={{
+                        padding: "0 10px",
+                        backgroundColor: wordLen % 2 === 0 ? "#fff" : "#e6e6ff",
+                      }}
                     >
-                      {chunk.map((word) => (
-                        <li style={{ paddingBottom: 5 }}>{word}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                      <p>
+                        <strong>
+                          {wordLen}&nbsp;Letter
+                          {wordLen > 1 ? "s" : ""}
+                        </strong>
+                      </p>
+                      <ul
+                        style={{ listStyleType: "none", margin: 0, padding: 0 }}
+                      >
+                        {chunk.map((word) => (
+                          <li style={{ paddingBottom: 5 }}>{word}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
